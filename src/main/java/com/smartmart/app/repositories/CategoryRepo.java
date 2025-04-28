@@ -12,13 +12,10 @@ import com.smartmart.app.models.Category;
 public class CategoryRepo {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	public boolean isAddNewCategory(Category category) {
-		int value =jdbcTemplate.update("INSERT INTO categories (category_id,category_name, image_url) values('0',?,?)",(ps)->{
-			ps.setString(1, category.getCategory_name());
-			ps.setString(2, category.getImage_url());
-		});
-		return value>0?true:false;
-	}
+	public int saveCategory(Category category) {
+        String sql = "INSERT INTO categories (category_name, image_url) VALUES (?, ?)";
+        return jdbcTemplate.update(sql, category.getCategory_name(), category.getImage_url());
+    }
 	
 	public List<Category> showAllData(){
 		List<Category> al=jdbcTemplate.query("SELECT category_id, category_name, image_url, created_at FROM categories;", (rs,row)->{
