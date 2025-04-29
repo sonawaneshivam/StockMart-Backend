@@ -1,11 +1,11 @@
 package com.smartmart.app.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,7 +58,36 @@ public class CategoryService {
 		return categoryRepo.isDeleteCategory(id);
 	}
 	
-	public boolean isUpdate(Category category) {
-		return categoryRepo.isUpdate(category);
-	}
+	 public boolean updateCategory(int id, String categoryName, MultipartFile imageFile) {
+	        try {
+	            String fileName = null;
+
+	            // Handle image upload
+	            if (imageFile != null && !imageFile.isEmpty()) {
+	                fileName = imageFile.getOriginalFilename();
+	                Path filePath = Paths.get(UPLOAD_DIR + File.separator + fileName);
+
+	                if (!Files.exists(filePath)) {
+	                    Files.createDirectories(filePath.getParent());
+	                    Files.write(filePath, imageFile.getBytes());
+	                }
+	            }
+
+	            // If no new image is uploaded, use existing one from DB
+	            if (fileName == null) {
+	                fileName = categoryRepo.getImageUrlById(id);
+	            }
+
+	            // Create Category object
+	            Category category = new Category();
+	            category.setCategory_id(id);
+	            category.setCategory_name(categoryName);
+	            category.setImage_url(fileName);
+
+	            return categoryRepo.isUpdate(category);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            return false;
+	        }
+	    }
 }

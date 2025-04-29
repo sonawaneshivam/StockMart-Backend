@@ -34,11 +34,19 @@ public class CategoryRepo {
 	}
 	
 	public boolean isUpdate(Category category) {
-		int value=jdbcTemplate.update("UPDATE categories SET category_name = ?, image_url = ? WHERE category_id = ?",(ps)->{
-			ps.setString(1, category.getCategory_name());
-			ps.setString(2, category.getImage_url());
-			ps.setInt(3, category.getCategory_id());
-		});
-		return value>0?true:false;
-	}
+        int value = jdbcTemplate.update(
+            "UPDATE categories SET category_name = ?, image_url = ? WHERE category_id = ?",
+            ps -> {
+                ps.setString(1, category.getCategory_name());
+                ps.setString(2, category.getImage_url());
+                ps.setInt(3, category.getCategory_id());
+            }
+        );
+        return value > 0;
+    }
+
+    public String getImageUrlById(int id) {
+        String sql = "SELECT image_url FROM categories WHERE category_id = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, id);
+    }
 }

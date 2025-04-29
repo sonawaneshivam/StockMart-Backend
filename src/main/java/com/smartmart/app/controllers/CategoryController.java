@@ -3,12 +3,12 @@ package com.smartmart.app.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,14 +58,22 @@ public class CategoryController {
 		}
 	}
 
-	@PutMapping("/update")
-	public String isUpdate(@RequestBody Category category) {
-		if (categoryService.isUpdate(category)) {
-			return "category is updates";
-		} else {
-			return "category is not updated";
-		}
+	 @PutMapping("/update")
+	    public ResponseEntity<String> updateCategory(
+	            @RequestParam("id") int id,
+	            @RequestParam("category_name") String categoryName,
+	            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
 
-	}
+	        try {
+	            if (categoryService.updateCategory(id, categoryName, imageFile)) {
+	                return ResponseEntity.ok("Category updated successfully!");
+	            } else {
+	                return ResponseEntity.badRequest().body("Failed to update category!");
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.internalServerError().body("Server error!");
+	        }
+	    }
 
 }
