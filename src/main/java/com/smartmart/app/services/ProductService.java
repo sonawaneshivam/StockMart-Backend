@@ -45,6 +45,7 @@ public class ProductService {
 	public boolean storeData(Stock stock) {
 		return productRepository.storeData(stock);
 	}
+	
 	public List<Stock> showAllProduct(){
 		return productRepository.showAllProduct();
 	}

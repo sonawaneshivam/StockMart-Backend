@@ -53,7 +53,16 @@ public class ProductController {
 	
 	@GetMapping("/showAll")
 	public List<Stock> showAllProduct(){
-		return productService.showAllProduct();
+		List<Stock> product=productService.showAllProduct();
+		 String baseUrl = "http://localhost:8080/image/"; // Modify this based on your actual setup
+
+	        // Append the image base URL to each category's image name
+		 product.forEach(products -> {
+	            String imageUrl = baseUrl + products.getProduct_image_url();
+	            products.setProduct_image_url(imageUrl); // Update the category object with the full image URL
+	        });
+
+		return product;
 	}
 	
 	@GetMapping("/showProductByCategory")
