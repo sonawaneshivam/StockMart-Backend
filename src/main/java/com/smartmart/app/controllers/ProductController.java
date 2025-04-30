@@ -3,35 +3,53 @@ package com.smartmart.app.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.smartmart.app.models.Product;
 import com.smartmart.app.models.Stock;
 import com.smartmart.app.services.ProductService;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/product")
 public class ProductController {
 	@Autowired
 	private ProductService productService;
 	@PostMapping("/add")
-	public String addProduct(@RequestBody Stock stock) {
-		if (productService.storeData(stock)) {
-			return "product is added";
-		} else {
+    public ResponseEntity<String> addProduct(@RequestParam String p_name,
+                                             @RequestParam String p_description,
+                                             @RequestParam int category_id,
+                                             @RequestParam int p_price,
+                                             @RequestParam int stock,
+                                             @RequestParam("image") MultipartFile image) {
+       
+        Stock s=new Stock();
+       s.setName(p_name);
+       s.setDescription(p_description);
+       s.setCategory_id(category_id);
+       s.setPrice(p_price);
+       s.setQuantity(stock);
+       String imageUrl = productService.saveProductImage(image);
+       s.setProduct_image_url(imageUrl); 
+       
 
-			return "product is not added";
-		}
-	}
+        if (productService.storeData(s)) {
+            return ResponseEntity.ok("Product is added successfully");
+        } else {
+            return ResponseEntity.status(500).body("Product not added");
+        }
+    }
 	
 	@GetMapping("/showAll")
 	public List<Stock> showAllProduct(){
