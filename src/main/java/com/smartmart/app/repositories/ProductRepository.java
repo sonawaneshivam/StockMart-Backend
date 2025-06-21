@@ -29,7 +29,7 @@ public class ProductRepository {
 	}
 	
 	public List<Stock> showAllProduct(){
-		String data="select p.product_id,p.name,p.price,p.description,p. product_image_url,s.quantity from products p inner join stock s on p.product_id=s.product_id;";
+		String data="select p.product_id,p.name,p.price,p.description,p. product_image_url,s.quantity,c.category_name from products p inner join stock s on p.product_id=s.product_id inner join categories c on c.category_id=p.category_id;";
 		List<Stock> li=jdbcTemplate.query(data,(rs,row)->{
 			Stock s=new Stock();
 			s.setProduct_id(rs.getInt(1));
@@ -38,7 +38,7 @@ public class ProductRepository {
 			s.setDescription(rs.getString(4));
 			s.setProduct_image_url(rs.getString(5));
 			s.setQuantity(rs.getInt(6));
-			
+			s.setCategory_name(rs.getString(7));
 			return s;
 		});
 		return li;

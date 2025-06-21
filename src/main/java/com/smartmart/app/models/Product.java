@@ -16,5 +16,6 @@ public class Product extends Category {
 	private int  price;
 	private String description;
 	private String product_image_url;
+	 private MultipartFile product_image;
 	
 }

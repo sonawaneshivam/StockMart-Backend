@@ -1,21 +1,26 @@
 package com.smartmart.app.controllers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.smartmart.app.models.Product;
 import com.smartmart.app.models.Stock;
 import com.smartmart.app.services.ProductService;
 
@@ -81,13 +86,30 @@ public class ProductController {
 	}
 	
 	@PutMapping("/update")
-	public String updateProduct(@RequestBody Stock stock) {
-		if (productService.isUpdateProduct(stock)) {
-			return "the product was Updated";
-		} else {
-			return "product was not Updated";
-		}
+	public String updateProduct(@ModelAttribute Stock stock,
+	                            @RequestParam(value = "image", required = false) MultipartFile image) {
+	    try {
+	        if (image != null && !image.isEmpty()) {
+	            // handle image saving logic, e.g. save file and set path
+	            String imagePath = saveImage(image); // You need to implement this method
+	            stock.setProduct_image_url(imagePath);
+	        }
+
+	        boolean updated = productService.isUpdateProduct(stock);
+	        return updated ? "The product was updated" : "Product was not updated";
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return "Error occurred during product update";
+	    }
 	}
-	
+	private String saveImage(MultipartFile image) throws IOException {
+	    String uploadDir = "product-images/";
+	    String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+	    Path filePath = Paths.get(uploadDir + fileName);
+	    Files.createDirectories(filePath.getParent());
+	    Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+	    return "/images/" + fileName;
+	}
+
 	
 }
